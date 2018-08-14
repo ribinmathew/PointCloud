@@ -1,97 +1,77 @@
 import numpy as np
 import pcl
-import random
+from pcl import pcl_visualization
+cloud = pcl.load('/home/ribin/Downloads/object_02/test58.pcd')
+vg = cloud.make_voxel_grid_filter()
+vg.set_leaf_size(0.001, 0.001, 0.001)
+cloud_filtered = vg.filter()
 
-import pcl.pcl_visualization
+#print(cloud_filtered)
 
-# pcl::PointCloud<pcl::PointXYZRGB> cloud;
-cloud = pcl.PointCloud_PointXYZRGB()
-
-# Fill in the cloud data
-# cloud.width  = 15;
-# cloud.height = 10;
-# cloud.points.resize (cloud.width * cloud.height)
-# cloud.resize (np.array([15, 10], dtype=np.float))
-# points = np.zeros((10, 15, 4), dtype=np.float32)
-points = np.zeros((150, 4), dtype=np.float32)
-RAND_MAX = 1.0
-# Generate the data
-for i in range(0, 75):
-    # set Point Plane
-    points[i][0] = 1024 * random.random () / (RAND_MAX + 1.0)
-    points[i][1] = 1024 * random.random () / (RAND_MAX + 1.0)
-    points[i][2] =  0.1 * random.random () / (RAND_MAX + 1.0)
-    points[i][3] = 255 << 16 | 255 << 8 | 255
-
-for i in range(75, 150):
-    # set Point Randomize
-    points[i][0] = 1024 * random.random () / (RAND_MAX + 1.0)
-    points[i][1] = 1024 * random.random () / (RAND_MAX + 1.0)
-    points[i][2] = 1024 * random.random () / (RAND_MAX + 1.0)
-    points[i][3] = 255 << 16 | 255 << 8 | 255
-
-# Set a few outliers
-points[0][2] = 2.0;
-points[3][2] = -2.0;
-points[6][2] = 4.0;
-
-#print (cloud)
-
-#for i in range(0, 150):
-    #print (points[i][0], points[i][1], points[i][2], points[i][3])
-
-cloud.from_array(points)
-
-
-
-# Create the segmentation object
-# pcl::SACSegmentation<pcl::PointXYZRGB> seg
 seg = cloud.make_segmenter()
-print seg
+seg.set_optimize_coefficients(True)
+seg.set_model_type(pcl.SACMODEL_PLANE)
+seg.set_method_type(pcl.SAC_RANSAC)
+seg.set_MaxIterations(100)
+seg.set_distance_threshold(0.03)
 
-# Optional
-seg.set_optimize_coefficients (True)
-# Mandatory
-seg.set_model_type (pcl.SACMODEL_PLANE)
-seg.set_method_type (pcl.SAC_RANSAC)
-seg.set_distance_threshold (0.1)
+[inliers_plane, coefficients_plane] = seg.segment ()
+cloud_plane = cloud.extract(inliers_plane, True)
 
-# pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients)
-# pcl::PointIndices::Ptr inliers (new pcl::PointIndices);
-inliers, model = seg.segment()
 
-# if inliers.size
-# 	return
-# end
+i = 0
+nr_points = cloud_filtered.size
+print(nr_points)
 
-print (model)
-# std::cerr << "Model coefficients: " << coefficients->values[0] << " "
-# << coefficients->values[1] << " "
-# << coefficients->values[2] << " "
-# << coefficients->values[3] << std::endl;
-#
-# std::cerr << "Model inliers: " << inliers->indices.size () << std::endl;
-# for (size_t i = 0; i < inliers->indices.size (); ++i)
-# {
-#   std::cerr << inliers->indices[i] << "    " << cloud.points[inliers->indices[i]].x << " "
-#   << cloud.points[inliers->indices[i]].y << " "
-#   << cloud.points[inliers->indices[i]].z << std::endl;
-#   cloud.points[inliers->indices[i]].r = 255;
-#   cloud.points[inliers->indices[i]].g = 0;
-#   cloud.points[inliers->indices[i]].b = 0;
-# }
-for i in inliers:
-    points[i][3] = 255 << 16 | 255 << 8 | 0
 
-cloud.from_array(points)
 
-#
-# pcl::visualization::CloudViewer viewer("Cloud Viewer");
-# viewer.showCloud(cloud.makeShared());
-# while (!viewer.wasStopped ())
+tree = cloud_filtered.make_kdtree()
+tree1 = cloud_filtered.make_kdtree_flann()
+
+
+ec = cloud_filtered.make_EuclideanClusterExtraction()
+ec.set_ClusterTolerance (0.02)
+ec.set_MinClusterSize (3000)
+ec.set_MaxClusterSize (80000)
+ec.set_SearchMethod (tree)
+cluster_indices = ec.Extract()
+
+cloud_cluster = pcl.PointCloud()
+
+for j, indices in enumerate(cluster_indices):
+    # cloudsize = indices
+    print('indices = ' + str(len(indices)))
+    # cloudsize = len(indices)
+    points = np.zeros((len(indices), 3), dtype=np.float32)
+    # points = np.zeros((cloudsize, 3), dtype=np.float32)
+
+    # for indice in range(len(indices)):
+    for i, indice in enumerate(indices):
+        # print('dataNum = ' + str(i) + ', data point[x y z]: ' + str(cloud_filtered[indice][0]) + ' ' + str(cloud_filtered[indice][1]) + ' ' + str(cloud_filtered[indice][2]))
+        # print('PointCloud representing the Cluster: ' + str(cloud_cluster.size) + " data points.")
+        points[i][0] = cloud_filtered[indice][0]
+        points[i][1] = cloud_filtered[indice][1]
+        points[i][2] = cloud_filtered[indice][2]
+
+    cloud_cluster.from_array(points)
+    #ss = "cloud_cluster_" + str(i) + ".pcd";
+print(points)
+
+
+cloud_cluster = pcl.PointCloud(points)
+
+
+
 visual = pcl.pcl_visualization.CloudViewing()
-visual.ShowColorCloud(cloud)
+#visual.ShowColorCloud(cloud1)
+while 1:
 
-v = True
-while v:
-    v=not(visual.WasStopped())
+
+    #visual = pcl.pcl_visualization.CloudViewing()
+   # visual.ShowColorCloud(cloud, b'cloud')
+ #   visual.ShowColorCloud(cloud1,b'cloud')
+    visual.ShowMonochromeCloud(cloud_filtered)
+    visual.ShowMonochromeCloud(cloud_cluster)
+   # visual.ShowColorCloud(cloud1)
+    #visual.ShowColorCloud(cloud_cylinder)
+    #visual.ShowColorCloud(filtered_cloud)

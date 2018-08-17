@@ -33,3 +33,5 @@ for link in soup.find("li"):
     print title,dictval[title]
 
 
+# this is the code to get the io status of the abb1200
+#its gives the status of the input pin 1

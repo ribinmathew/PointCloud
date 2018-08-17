@@ -23,7 +23,7 @@ def do_voxel_grid_filter(point_cloud, LEAF_SIZE = 0):
     voxel_filter.set_leaf_size(LEAF_SIZE, LEAF_SIZE, LEAF_SIZE)
     return voxel_filter.filter()
 
-def do_ransac_plane_segmentation(point_cloud, max_distance = .001):
+def do_ransac_plane_segmentation(point_cloud, max_distance):
 
   segmenter = point_cloud.make_segmenter()
 
@@ -45,7 +45,7 @@ downsampled_cloud = do_voxel_grid_filter(point_cloud = cloud, LEAF_SIZE = 0.01)
 filtered_cloud = do_passthrough_filter(point_cloud = downsampled_cloud,
 name_axis = 'z', min_axis = 0.6, max_axis = 1.1)
 #table_cloud, objects_cloud = do_ransac_plane_segmentation(filtered_cloud, max_distance = 0.01)
-table_cloud, objects_cloud = do_ransac_plane_segmentation(cloud, max_distance = 0.01)
+table_cloud, objects_cloud = do_ransac_plane_segmentation(cloud, max_distance = 0.1)
 
 
 

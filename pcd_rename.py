@@ -1,5 +1,5 @@
 import os
-path = '/home/ribin/Desktop/pcdfiles'
+path = '/media/ribin/DATA/bagfiles/pcdfiles/Zed_new_HQ'
 files = os.listdir(path)
 i = 1
 

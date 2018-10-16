@@ -5,6 +5,7 @@
 import pcl
 from pcl import pcl_visualization
 import numpy as np
+<<<<<<< HEAD
 
 from pykdtree.kdtree import KDTree
 import matplotlib.pyplot as plt
@@ -13,6 +14,11 @@ cloud5 = pcl.PointCloud_PointXYZRGB()
 
 
 
+=======
+import matplotlib.pyplot as plt
+cloud5 = pcl.PointCloud_PointXYZRGB()
+
+>>>>>>> origin/master
 #hwe we are gonna load one point cloud
 cloud1 = pcl.load_XYZRGB('/media/ribin/DATA/addverb/binpicking/pcd files/object_pcd/soap_santoor/2.pcd')
 print(cloud1)
@@ -55,6 +61,7 @@ for j in range(0,cloud2_size-200):
 cloud5.from_array(cloud3)
 
 
+<<<<<<< HEAD
 def do_passthrough_filter(point_cloud, name_axis = 'z', min_axis = 0.01, max_axis = 1.1):
   pass_filter = point_cloud.make_passthrough_filter()
   pass_filter.set_filter_field_name(name_axis);
@@ -103,6 +110,10 @@ print(idx.size)
 print("reached")
 visual = pcl.pcl_visualization.CloudViewing()
 visual.ShowColorCloud(objects_cloud)
+=======
+visual = pcl.pcl_visualization.CloudViewing()
+visual.ShowColorCloud(cloud5)
+>>>>>>> origin/master
 
 
 v = True

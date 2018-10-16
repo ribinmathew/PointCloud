@@ -1,4 +1,30 @@
-"""lets create a working code"""
+
+
+import numpy as np
+"""
+p1 = np.array([10, 2, 3])
+p2 = np.array([10,30, 4])
+p3 = np.array([10, 4, 5])
+
+
+# These two vectors are in the plane
+v1 = p3 - p1
+v2 = p2 - p1
+print(v1,v2)
+# the cross product is a vector normal to the plane
+cp = np.cross(v1, v2)
+print(cp)
+a, b, c = cp
+
+print(a,b,c)
+
+# This evaluates a * x3 + b * y3 + c * z3 which equals d
+d = np.dot(cp, p3)
+print (d)
+
+print('The equation is {0}x + {1}y + {2}z = {3}'.format(a, b, c, d))
+
+"""
 
 from sklearn.cluster import KMeans
 import pcl
@@ -14,7 +40,9 @@ import matplotlib.pyplot as plt
 #path = "/home/ribin/Desktop/pcdfiles"
 
 
-cloud = pcl.load_XYZRGB('/media/ribin/DATA/addverb/binpicking/pcd_files/object_pcd/biscut/2.pcd')
+#cloud = pcl.load_XYZRGB('/media/ribin/DATA/addverb/binpicking/pcd_files/object_pcd/soap_santoor/2.pcd')
+#cloud = pcl.load_XYZRGB('/media/ribin/DATA/addverb/binpicking/pcd_files/object_pcd/colgate/2.pcd')
+cloud = pcl.load_XYZRGB('/media/ribin/DATA/addverb/binpicking/pcd_files/2.pcd')
 print(cloud)
 #   print(cloud.shape)
 cloud2 = np.zeros((307201,4),dtype=np.float32)
@@ -54,11 +82,13 @@ name_axis = 'z', min_axis = 0.6, max_axis = 1.1)
 table_cloud, objects_cloud = do_ransac_plane_segmentation(filtered_cloud, max_distance = 0.01)
 
 
+table_cloud, objects_cloud = do_ransac_plane_segmentation(objects_cloud, max_distance = 0.005)
 
 
 
 
 objects_cloud_mono = []
+"""
 for i in range(0,objects_cloud.size):
     #print i[0]
     points = (objects_cloud[i][0],objects_cloud[i][1],objects_cloud[i][2])
@@ -68,6 +98,19 @@ for i in range(0,objects_cloud.size):
     objects_cloud_mono.append(points)
    # objects_cloud_mono[i][1]=[i][1]
     #objects_cloud_mono[i][2]= [i][2]
+
+"""
+
+for i in range(0,table_cloud.size):
+    #print i[0]
+    points = (table_cloud[i][0],table_cloud[i][1],table_cloud[i][2])
+   # print(points)
+    #print(i)
+   # print(objects_cloud_mono[0])
+    objects_cloud_mono.append(points)
+   # objects_cloud_mono[i][1]=[i][1]
+    #objects_cloud_mono[i][2]= [i][2]
+
 
 
 #for i in objects_cloud_mono:
@@ -86,109 +129,61 @@ for i in range(0,len(objects_cloud_mono)):
     z.append(objects_cloud_mono[i][2])
 
 
-#for i in z:
- #   print(i)
-
-
-#plt.scatter(y,z, c='black', s=7)
-
-
-#plt.show(
-
-kmeans = KMeans(n_clusters=3)
-kmeans = kmeans.fit(objects_cloud_mono)
-C = kmeans.cluster_centers_
-
-
-print(C)
 
 
 
-
-plt.scatter(x,y,color='r')
-#plt.scatter(x,y,color='b')
-plt.xlabel('x')
-plt.ylabel('y')
-plt.show()
-
-
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 fig = plt.figure()
-#ax = fig.add_subplot(111, projection='3d')
 ax = fig.add_subplot(111, projection='3d')
-#ax.plot3D(x, y,z, zdir='z', c= 'red')
-ax.plot(x, y, z, c=z, cmap='Greens')
+
+#x = np.linspace(-2, 14, 5)
+#y = np.linspace(-2, 14, 5)
+#X, Y = np.meshgrid(x, y)
+
+#Z = (d - a * X - b * Y) / c
 
 
-ax.scatter(C[:, 0], C[:, 1], C[:,2], marker='.', c='#050505', s=1000)
-ax.set_title('surface')
-ax.set_xlabel('x')
-ax.set_ylabel('y')
-ax.set_zlabel('z')
-
-
-
-plt.show()
-#for i in objects_cloud_mono:
-   # print(i)
-
-
+# plot the mesh. Each array is 2D, so we flatten them to 1D arrays
+"""ax.plot(X.flatten(),
+        Y.flatten(),
+        Z.flatten(), 'bo ')
 """
 
+ax.plot(x,y,z,'bo')
+# plot the original points. We use zip to get 1D lists of x, y and z
+# coordinates.
+#ax.plot(*zip(p1, p2, p3), color='r', linestyle=' ', marker='o')
 
-width = 1/1.5
-plt.bar(x, y, width, color="blue")
+# adjust the view so we can see the point/plane alignment
+ax.view_init(0, 22)
+plt.tight_layout()
 
-plt.plot(x,y)
-plt.xlabel('x - axis')
-plt.ylabel('y - axis')
-
-plt.title('My first graph!')
-
-#function to show the plot
 plt.show()
 
 
-"""
 
 
-#point_cloud.from_array(objects_cloud_mono)
-#print(objects_cloud_mono)
+
+
+
+
+""" lets do 
+
+
+
+
+
 
 
 visual = pcl.pcl_visualization.CloudViewing()
-while 1:
+#while 1:
 
 
     #visual = pcl.pcl_visualization.CloudViewing()
-    visual.ShowColorCloud(cloud, b'cloud')
+ #   visual.ShowColorCloud(cloud, b'cloud')
     #visual.ShowColorCloud(cloud,b'cloud')
     #visual.ShowMonochromeCloud(objects_cloud_mono)
     #visual.ShowColorCloud(downsampled_cloud)
     #visual.ShowColorCloud(objects_cloud)
     #visual.ShowColorCloud(filtered_cloud)
-
-
-
-"""
-p1 = np.array([10, 2, 3])
-p2 = np.array([10,30, 4])
-p3 = np.array([10, 4, 5])
-
-
-# These two vectors are in the plane
-v1 = p3 - p1
-v2 = p2 - p1
-print(v1,v2)
-# the cross product is a vector normal to the plane
-cp = np.cross(v1, v2)
-print(cp)
-a, b, c = cp
-
-print(a,b,c)
-
-# This evaluates a * x3 + b * y3 + c * z3 which equals d
-d = np.dot(cp, p3)
-print (d)
-
-print('The equation is {0}x + {1}y + {2}z = {3}'.format(a, b, c, d))
-"""
